@@ -1,5 +1,5 @@
 
-import { ScopedRoles, UserRoles, getUserRolesFromUsspService, getOrgRolesFromOrgService } from "./fetchers/roleFetcher";
+import { ScopedRoles, UserRoles, getUserRolesFromUsspService, getOrgRolesFromOrgService } from "./fetchers/roleFetcher.js";
 /**
  * Middleware to build an authentication function that retrieves user data from the User and Organization microservices.
  *

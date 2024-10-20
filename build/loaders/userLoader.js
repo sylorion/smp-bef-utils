@@ -1,0 +1,17 @@
+// userLoaders.ts
+import DataLoader from 'dataloader';
+import { getProfilesByIDsFromUsspService } from './fetchers/userFetcher.js';
+export function createUserLoaders() {
+    return {
+        profiles: new DataLoader(async (profileIDs) => {
+            const profileMap = await getProfilesByIDsFromUsspService([...profileIDs]);
+            return profileIDs.map((id) => profileMap.get(id) || undefined);
+        }),
+        users: new DataLoader(async (userIDs) => {
+            const userMap = await getProfilesByIDsFromUsspService([...userIDs]);
+            return userIDs.map((id) => userMap.get(id) || undefined);
+        }),
+    };
+}
+const Loaders = { createUserLoaders };
+export { Loaders };

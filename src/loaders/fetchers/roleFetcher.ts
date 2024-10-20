@@ -1,8 +1,8 @@
 
 import { gql, request } from 'graphql-request';
 
-const USER_SERVICE_URL = process.env.SMP_USER_SPACE_SERVICE_URL;
-const ORG_SERVICE_URL = process.env.SMP_ORGANIZATION_SERVICE_URL;
+const USER_SERVICE_URL:string = process.env.SMP_USER_SPACE_SERVICE_URL ?? 'http://localhost:4000/graphql';
+const ORG_SERVICE_URL:string = process.env.SMP_ORGANIZATION_SERVICE_URL ?? 'http://localhost:4000/graphql';
 
 export interface Role {
   roleID: number;
@@ -55,7 +55,7 @@ export const getUserRolesFromUsspService = async (userID: string): Promise<Role[
     filter: [{ field: "userID", value: `${userID}`, operator: "=" }]
   };
   const response = await request(USER_SERVICE_URL, query, variables);
-  return response.userRoles;
+  return (response as any).userRoles;
 }
 
 /**
@@ -89,5 +89,5 @@ export const getOrgRolesFromOrgService = async (userID: string): Promise<Role[]>
     filter: [{ field: "userID", value: `${userID}`, operator: "=" }]
   };
   const response = await request(ORG_SERVICE_URL, query, variables);
-  return response.userOrganizations;
+  return (response as any).userOrganizations;
 }
