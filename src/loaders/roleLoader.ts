@@ -29,9 +29,8 @@ export async function rolesLoaderFor(userID: string, context: object | null): Pr
  *                            categorized by their scope (e.g., "SMP" for user roles and "ORG" for org roles).
  */
 async function scopedUserRoleServiceController(userID: string): Promise<ScopedRoles> {
-  const [userRoles, orgRoles] = await Promise.all([
-    await getUserRolesFromUsspService(userID), 
-    await getOrgRolesFromOrgService(userID)]);
+  const userRoles = await getUserRolesFromUsspService(userID);
+  const orgRoles = await getOrgRolesFromOrgService(userID);
 
   const roles: ScopedRoles = {};
   userRoles.forEach(role => {

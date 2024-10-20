@@ -2,7 +2,7 @@
 import DataLoader from 'dataloader';
 import { getProfilesByIDsFromUsspService } from './fetchers/userFetcher.js';
 
-export function createUserLoaders() {
+export function userLoaders() {
   return {
     profiles: new DataLoader<string, string[]>(async (profileIDs) => {
       const profileMap = await getProfilesByIDsFromUsspService([...profileIDs]);
@@ -15,7 +15,7 @@ export function createUserLoaders() {
   };
 }
 
-const Loaders = { createUserLoaders };
+const Loaders = { userLoaders };
   
 export { Loaders };
 
