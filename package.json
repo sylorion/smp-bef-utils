@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sylorion/smp-features-utils.git"
+    "url": "git+https://github.com/sylorion/smp-bef-utils.git"
   },
   "keywords": [
     "Generator",
@@ -48,6 +48,6 @@
   "author": "Sylorion",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/sylorion/smp-features-utils/issues"
+    "url": "https://github.com/sylorion/smp-bef-utils/issues"
   }
 }
