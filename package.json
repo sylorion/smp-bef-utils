@@ -2,7 +2,8 @@
   "name": "smp-feature-utils",
   "version": "0.0.1",
   "description": "Backend functions utils for the SMP features",
-  "main": "index.js",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "type": "module",
   "files": [
     "/build"
@@ -11,7 +12,8 @@
     "build": "tsc",
     "test": "jest",
     "start": "npm run build ; node --trace-deprecation build/index.js",
-    "lint": "eslint 'src/**/*.{ts,js}' --fix"
+    "lint": "eslint 'src/**/*.{ts,js}' --fix",
+    "prepare": "tsc --outDir ./build",
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
