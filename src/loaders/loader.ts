@@ -171,26 +171,26 @@ export async function scopedRoleServiceController(userID: number): Promise<{ SMP
  * @param {string} userID - The ID of the user whose roles are to be fetched.
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of user roles.
  */
-const getUserRolesFromUsspService = async (userID: number): Promise<Role[]> => {
+export const getUserRolesFromUsspService = async (userID: number): Promise<Role[]> => {
   if (!userID) {
     return [];
   }
-  const query = gql`
-query GetUserRoles($filter: [FilterInput!], $sort: SortInput, $pagination: PaginationInput) {
-  userRoles(filter: $filter, sort: $sort, pagination: $pagination) {
-    userRoleID
-    uniqRef
-    slug
-    legend
-    authorID
-    userID
-    roleID
-    state
-    createdAt
-    updatedAt
-    deletedAt
+  const query = gql `
+  query GetUserRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
+    userRoles(pagination: { limit: 10, offset: 0 }, sort: { field: "userRoleID", order: "ASC" }, filter: [{ field: "userID", value: "56", operator: "=" }]){
+      userRoleID
+      uniqRef
+      slug
+      legend
+      authorID
+      userID
+      roleID
+      state
+      createdAt
+      updatedAt
+      deletedAt
+    }
   }
-}
   `;
 
   const variables = {
@@ -199,8 +199,14 @@ query GetUserRoles($filter: [FilterInput!], $sort: SortInput, $pagination: Pagin
     filter: [{ field: "userID", value: `${userID}`, operator: "=" }]
   };
   console.log(`getUserRolesFromUsspService USER_SERVICE_URL: ${USER_SERVICE_URL}`);
-  const response = await request(USER_SERVICE_URL, query, variables);
-  return (response as any).userRoles;
+  try {
+    const response = await request(USER_SERVICE_URL, query, variables);
+    const userRoles = (response as any).userRoles;
+    return userRoles;
+  } catch (error) {
+    console.error(`getUserRolesFromUsspService ERROR: ${error}`);
+    return [];
+  }
 };
 
 /**
@@ -223,11 +229,17 @@ export const getOrgRolesFromOrgService = async (userID: number): Promise<Role[]>
     query GetOrgRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
       userOrganizations(pagination: $pagination, sort: $sort, filter: $filter) {
         userOrganizationID
-        organizationID
-        roleID
+        uniqRef
+        slug
+        authorID
         legend
         userID
+        roleID
+        organizationID
         state
+        createdAt
+        updatedAt
+        deletedAt
       }
     }
   `;
