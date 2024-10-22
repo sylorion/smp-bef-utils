@@ -4,7 +4,8 @@ import { authenticatedDirective } from './graphql/directives/authenticatedDirect
 import { authorizationDirective } from './graphql/directives/authorizationDirective.js'
 import { rolesLoaderFor } from './loaders/roleLoader.js'
 import { userLoaders } from './loaders/userLoader.js'
-export { authenticationMiddleware, getUserRolesFromUsspService, getOrgRolesFromOrgService} from './loaders/loader.js'
+export { getUserRolesFromUsspService, getOrgRolesFromOrgService} from './loaders/loader.js'
+export { authenticationMiddleware, } from './middleware/authn.js'
 export { rolesLoaderFor, userLoaders, authenticatedDirective, authorizationDirective } ;
 
 import { ApolloServer } from 'apollo-server';

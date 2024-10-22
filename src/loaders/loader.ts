@@ -1,8 +1,6 @@
 import pkgjwt from 'jsonwebtoken'; 
-
-const jwt = pkgjwt; 
 import { gql, request } from 'graphql-request';
-
+const jwt = pkgjwt; 
 const JWT_SECRET = process.env.SMP_USER_JWT_ACCESS_SECRET || 'f52001a8f0d6aa43ef65af68f8e9c81fac1a518666a7d8aec94a075ca11bee122dc87244ccfd9ec7187f1f51c066ee4a683bdcf6b0a5d1b5ec683c2b140d742a';
 const USER_SERVICE_URL = process.env.SMP_USER_SPACE_SERVICE_URL || 'http://localhost:4000/graphql';
 const ORG_SERVICE_URL = process.env.SMP_ORGANIZATION_SERVICE_URL || 'http://localhost:4001/graphql';
@@ -26,73 +24,73 @@ type UserContext = {
   };
 };
 
-/**
- * Middleware to check the authorization token of a user.
- * 
- * This function extracts the JWT token from the request headers, decodes it to get user details,
- * fetches user roles from the User and Organization microservices, and attaches the roles and 
- * user details to the request object.
- * 
- * @param {Object} req - The request object.
- * @param {Object} req.headers - The headers of the request.
- * @param {string} req.headers.authorization - The authorization header containing the Bearer token.
- * @param {string} req.headers.Authorization - The authorization header containing the Bearer token (case insensitive).
- * @param {string} req.ip - The IP address of the client making the request.
- * @param {string} req.headers.origin - The origin header of the request.
- * @param {string} req.headers.referer - The referer header of the request.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function in the stack. 
- * @returns {void} 
- * @throws {Error} If there is an error in user authentication.
- */
-export async function checkAuthUserToken(req: any, res: any, next: any) {
-  const userToken = req.headers['authorization'] || req.headers['Authorization'];
-  if (!userToken || !userToken.startsWith('Bearer ')) {
-    if (process.env.ENV_NODE != "prod") {
-      console.error("======== NO BEARER FOR USER ========="); 
-      console.log(`Nouvelle requête de ${req.ip} depuis ${req.headers.origin} + referrer : ${req.headers.referer}`);
-      next();
-    }
-  } else {
-    const token = userToken.split(' ')[1];
-    if (token) {
-      const decodedToken = jwt.verify(token, JWT_SECRET);
-      const { userID } = (decodedToken as any);
-      console.log(`checkAuthUserToken Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
-      const userRoles = await getUserRolesFromUsspService(userID);
-      const orgRoles = await getOrgRolesFromOrgService(userID);
+// /**
+//  * Middleware to check the authorization token of a user.
+//  * 
+//  * This function extracts the JWT token from the request headers, decodes it to get user details,
+//  * fetches user roles from the User and Organization microservices, and attaches the roles and 
+//  * user details to the request object.
+//  * 
+//  * @param {Object} req - The request object.
+//  * @param {Object} req.headers - The headers of the request.
+//  * @param {string} req.headers.authorization - The authorization header containing the Bearer token.
+//  * @param {string} req.headers.Authorization - The authorization header containing the Bearer token (case insensitive).
+//  * @param {string} req.ip - The IP address of the client making the request.
+//  * @param {string} req.headers.origin - The origin header of the request.
+//  * @param {string} req.headers.referer - The referer header of the request.
+//  * @param {Object} res - The response object.
+//  * @param {Function} next - The next middleware function in the stack. 
+//  * @returns {void} 
+//  * @throws {Error} If there is an error in user authentication.
+//  */
+// export async function checkAuthUserToken(req: any, res: any, next: any) {
+//   const userToken = req.headers['authorization'] || req.headers['Authorization'];
+//   if (!userToken || !userToken.startsWith('Bearer ')) {
+//     if (process.env.ENV_NODE != "prod") {
+//       console.error("======== NO BEARER FOR USER ========="); 
+//       console.log(`Nouvelle requête de ${req.ip} depuis ${req.headers.origin} + referrer : ${req.headers.referer}`);
+//       next();
+//     }
+//   } else {
+//     const token = userToken.split(' ')[1];
+//     if (token) {
+//       const decodedToken = jwt.verify(token, JWT_SECRET);
+//       const { userID } = (decodedToken as any);
+//       console.log(`checkAuthUserToken Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
+//       const userRoles = await getUserRolesFromUsspService(userID);
+//       const orgRoles = await getOrgRolesFromOrgService(userID);
 
-      const roles: Record<KnownScope, string[]> = { SMP: [], ORG: [] };
-      userRoles.forEach(role => {
-        role.roleScope = "SMP";
-        if (!roles[role.roleScope]) {
-          roles[role.roleScope] = [];
-        }
-        roles[role.roleScope].push(role.roleID);
-      });
-      orgRoles.forEach(role => {
-        role.roleScope = "ORG";
-        if (!roles[role.roleScope]) {
-          roles[role.roleScope] = [];
-        }
-        roles[role.roleScope].push(role.roleID);
-      });
+//       const roles: Record<KnownScope, string[]> = { SMP: [], ORG: [] };
+//       userRoles.forEach(role => {
+//         role.roleScope = "SMP";
+//         if (!roles[role.roleScope]) {
+//           roles[role.roleScope] = [];
+//         }
+//         roles[role.roleScope].push(role.roleID);
+//       });
+//       orgRoles.forEach(role => {
+//         role.roleScope = "ORG";
+//         if (!roles[role.roleScope]) {
+//           roles[role.roleScope] = [];
+//         }
+//         roles[role.roleScope].push(role.roleID);
+//       });
 
-      try {
-        req.user = {
-          userID, 
-          roles,
-        };
-        console.log(`checkAuthUserToken User roles: ${JSON.stringify(req.user, null, 2)}`);
-      } catch (error) {
-        console.error("======== ERROR IN USER AUTHENTICATION =========");
-        console.error(error);
-        // throw error;
-      }
-      next();
-    }
-  }
-}
+//       try {
+//         req.user = {
+//           userID, 
+//           roles,
+//         };
+//         console.log(`checkAuthUserToken User roles: ${JSON.stringify(req.user, null, 2)}`);
+//       } catch (error) {
+//         console.error("======== ERROR IN USER AUTHENTICATION =========");
+//         console.error(error);
+//         // throw error;
+//       }
+//       next();
+//     }
+//   }
+// }
 
 /**
  * Builds an authentication middleware function.
