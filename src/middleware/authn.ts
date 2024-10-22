@@ -30,8 +30,15 @@ export function authenticationMiddlewareBuilder(
       const token = userToken.split(' ')[1];
       if (token) {
         console.log("======== BEARER FOUND FOR USER ========="); 
+        let decodedToken;
         try {
-          const decodedToken = jwt.verify(token, JWT_SECRET);
+            decodedToken = jwt.verify(token, JWT_SECRET);
+        }
+        catch (error) {
+            console.error("JWT verification failed:", JSON.stringify(error, null, 2));
+        }
+
+        try { 
           const { id } = (decodedToken as any);
           // console.log(`authenticationMiddlewareBuilder Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
 
@@ -46,10 +53,10 @@ export function authenticationMiddlewareBuilder(
             roles: scopedRoles,
           }
           set(req, 'auth', user);
-          // console.log(`authenticationMiddlewareBuilder Me: ${JSON.stringify(req.me, null, 2)}`);
+          // console.log(`authenticationMiddlewareBuilder Me: ${JSON.stringify(req.auth, null, 2)}`);
         } catch (error) {
           if (process.env.ENV_NODE != "prod") {
-            console.error("JWT verification failed:", error);
+            console.error("Retrieval failed:", error);
           }
         }
       }
