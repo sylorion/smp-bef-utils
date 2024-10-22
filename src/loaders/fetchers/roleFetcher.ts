@@ -5,7 +5,7 @@ const USER_SERVICE_URL:string = process.env.SMP_USER_SPACE_SERVICE_URL ?? 'http:
 const ORG_SERVICE_URL:string = process.env.SMP_ORGANIZATION_SERVICE_URL ?? 'http://localhost:4000/graphql';
 
 export type KnownScope = 'SMP' | 'ORG';
-export type ScopedRole = { SMP: Role[], ORG: Role[] };
+export type ScopedRole = { SMP: string[], ORG: string[] };
 export interface Role {
   roleID: number;
   legend: string;

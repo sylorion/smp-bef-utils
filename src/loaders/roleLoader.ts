@@ -42,10 +42,10 @@ export async function scopedRoleServiceController(userID: number): Promise<Scope
   };
 
   userRoles.forEach(role => {
-    roles.SMP.push(role);
+    roles.SMP.push(role.legend);
   });
   orgRoles.forEach(role => { 
-    roles.ORG.push(role);
+    roles.ORG.push(role.legend);
   });
 
   return roles;
