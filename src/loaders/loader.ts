@@ -14,6 +14,7 @@ type UserToken = {
 
 type Role = {
   roleScope: KnownScpoe;
+  legend: string;
   roleID: string;
 };
 
@@ -127,14 +128,14 @@ export function authenticationMiddlewareBuilder(userService?: (userID: string) =
           if (!roles[role.roleScope]) {
             roles[role.roleScope] = [];
           }
-          roles[role.roleScope].push(role.roleID);
+          roles[role.roleScope].push(role.legend);
         });
         orgRoles.forEach(role => {
           role.roleScope = "ORG";
           if (!roles[role.roleScope]) {
             roles[role.roleScope] = [];
           }
-          roles[role.roleScope].push(role.roleID);
+          roles[role.roleScope].push(role.legend);
         });
 
         req.user = {
@@ -239,7 +240,7 @@ export const getOrgRolesFromOrgService = async (userID: string): Promise<Role[]>
     sort: { field: "userOrganizationID", order: "ASC" },
     filter: [{ field: "userID", value: `${userID}`, operator: "=" }]
   };
-  console.log(`getOrgRolesFromOrgService USER_SERVICE_URL: ${ORG_SERVICE_URL}`);
+  console.log(`getOrgRolesFromOrgService ORG_SERVICE_URL: ${ORG_SERVICE_URL}`);
   const response = await request(ORG_SERVICE_URL, query, variables);
   return (response as any).userOrganizations;
 };
