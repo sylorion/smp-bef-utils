@@ -31,23 +31,22 @@ export interface UserRoles {
  * @returns {Promise<Role[]>} A promise that resolves to an array of user roles.
  */
 export const getUserRolesFromUsspService = async (userID: string): Promise<Role[]> => {
-  const query = gql`
-    query GetUserRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
-      userRoles(pagination: $pagination, sort: $sort, filter: $filter) {
-          userRoleID
-          uniqRef
-          slug
-          legend
-          authorID
-          userID
-          roleID
-          state
-          createdAt
-          updatedAt
-          deletedAt
-      }
+  const query = gql `
+  query GetUserRoles {
+    userRoles(pagination: { limit: 10, offset: 0 }, sort: { field: "userRoleID", order: "ASC" }, filter: [{ field: "userID", value: "${userID}", operator: "=" }]){
+      userRoleID
+      uniqRef
+      slug
+      legend
+      authorID
+      userID
+      roleID
+      state
+      createdAt
+      updatedAt
+      deletedAt
     }
-  `;
+  }`;
 
   const variables = {
     pagination: { limit: 10, offset: 0 },

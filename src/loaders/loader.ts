@@ -176,8 +176,8 @@ export const getUserRolesFromUsspService = async (userID: number): Promise<Role[
     return [];
   }
   const query = gql `
-  query GetUserRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
-    userRoles(pagination: { limit: 10, offset: 0 }, sort: { field: "userRoleID", order: "ASC" }, filter: [{ field: "userID", value: "56", operator: "=" }]){
+  query GetUserRoles {
+    userRoles(pagination: { limit: 10, offset: 0 }, sort: { field: "userRoleID", order: "ASC" }, filter: [{ field: "userID", value: "${userID}", operator: "=" }]){
       userRoleID
       uniqRef
       slug
