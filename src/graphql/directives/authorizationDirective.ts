@@ -22,10 +22,14 @@ class SMPError extends Error {
 
 function checkRolesForScopes(requiredRoles:string[][], requiredScopes: string[][], context: any) {
   const userRoles: Record<string, any[]> = context.user.roles || []; 
-  if(!userRoles && requiredRoles.length > 0 && requiredScopes.length > 0) return false;
+  if(userRoles && requiredRoles.length > 0 && requiredScopes.length > 0) return false;
   const isAuthorized = requiredRoles.some((roleArray: string[], index: number) => {
     const scopeArray: string[] = requiredScopes[index];
     if (!scopeArray) return false;
+    console.log("scopeArray", scopeArray);
+    console.log("roleArray", roleArray);
+    console.log("userRoles", userRoles);
+    
     //TODO: Next release should check the role title/name and not the legend associated to the role
     const hasScopesAndRoles = scopeArray.every((scope) => userRoles[scope].every((role) => roleArray.includes(role.legend)));
     return hasScopesAndRoles ;
