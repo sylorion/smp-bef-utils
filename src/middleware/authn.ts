@@ -40,12 +40,12 @@ export function authenticationMiddlewareBuilder(
           let scopedRoles = undefined;
           if (scopedRoleService) scopedRoles = await scopedRoleService(Number(id));
           
-          const me = {
+          const user = {
             id: id,
             user: userDetails,
             roles: scopedRoles,
           }
-          set(req, 'me', me);
+          set(req, 'auth', user);
           // console.log(`authenticationMiddlewareBuilder Me: ${JSON.stringify(req.me, null, 2)}`);
         } catch (error) {
           if (process.env.ENV_NODE != "prod") {
