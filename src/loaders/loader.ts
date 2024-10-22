@@ -7,13 +7,14 @@ const JWT_SECRET = process.env.SMP_USER_JWT_ACCESS_SECRET || 'f52001a8f0d6aa43ef
 const USER_SERVICE_URL = process.env.SMP_USER_SPACE_SERVICE_URL || 'http://localhost:4000/graphql';
 const ORG_SERVICE_URL = process.env.SMP_ORGANIZATION_SERVICE_URL || 'http://localhost:4001/graphql';
 
-type KnownScpoe = 'SMP' | 'ORG';
+type KnownScope = 'SMP' | 'ORG';
 type UserToken = {
   userID: string; 
 };
 
+type ScopedRole = { SMP: Role[], ORG: Role[] };
 type Role = {
-  roleScope: KnownScpoe;
+  roleScope: KnownScope;
   legend: string;
   roleID: string;
 };
@@ -21,7 +22,7 @@ type Role = {
 type UserContext = {
   user: {
     userID: string; 
-    roles: Record<KnownScpoe, string[]>;
+    roles: Record<KnownScope, string[]>;
   };
 };
 
@@ -61,7 +62,7 @@ export async function checkAuthUserToken(req: any, res: any, next: any) {
       const userRoles = await getUserRolesFromUsspService(userID);
       const orgRoles = await getOrgRolesFromOrgService(userID);
 
-      const roles: Record<KnownScpoe, string[]> = { SMP: [], ORG: [] };
+      const roles: Record<KnownScope, string[]> = { SMP: [], ORG: [] };
       userRoles.forEach(role => {
         role.roleScope = "SMP";
         if (!roles[role.roleScope]) {
@@ -103,14 +104,14 @@ export async function checkAuthUserToken(req: any, res: any, next: any) {
  * @param {Function} [orgService] - Service for fetching organization roles.
  * @returns {Function} The authentication middleware function.
  */
-export function authenticationMiddlewareBuilder(userService?: (userID: string) => Promise<Role[]>, orgService?: (userID: string) => Promise<Role[]>): (req: any, res: any, next: any) => void {
+export function authenticationMiddlewareBuilder(userDetailService?: (userID: number) => Promise<any>, scopedRoleService?: (userID: number) => Promise<ScopedRole>): (req: any, res: any, next: any) => void {
   return async (req: any, res: any, next: any) => {
+    next();
     const userToken = req.headers['authorization'] || req.headers['Authorization'];
     if (!userToken || !userToken.startsWith('Bearer ')) {
       if (process.env.ENV_NODE != "prod") {
         console.error("======== NO BEARER FOR USER ========="); 
         console.log(`Nouvelle requête de ${req.ip} depuis ${req.headers.origin} + referrer : ${req.headers.referer}`);
-        next();
       }
     } else {
       const token = userToken.split(' ')[1];
@@ -119,28 +120,11 @@ export function authenticationMiddlewareBuilder(userService?: (userID: string) =
         const { userID } = (decodedToken as any);
         console.log(`authenticationMiddlewareBuilder Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
 
-        const userRoles: Role[] = userService ? await userService(userID) : [];
-        const orgRoles: Role[] = orgService ? await orgService(userID) : [];
-
-        const roles: Record<KnownScpoe, string[]> = { SMP: [], ORG: [] };
-        userRoles.forEach(role => {
-          role.roleScope = "SMP";
-          if (!roles[role.roleScope]) {
-            roles[role.roleScope] = [];
-          }
-          roles[role.roleScope].push(role.legend);
-        });
-        orgRoles.forEach(role => {
-          role.roleScope = "ORG";
-          if (!roles[role.roleScope]) {
-            roles[role.roleScope] = [];
-          }
-          roles[role.roleScope].push(role.legend);
-        });
-
+        const userRoles: Role[] = userDetailService ? await userDetailService(userID) : undefined;
+        const scopedRoles = scopedRoleService ? await scopedRoleService(userID) : undefined;
         req.user = {
           userID,
-          roles,
+          roles: scopedRoles,
         };
         console.log(`authenticationMiddlewareBuilder User roles: ${JSON.stringify(req.user, null, 2)}`);
       }
@@ -159,9 +143,10 @@ export function authenticationMiddlewareBuilder(userService?: (userID: string) =
  * @returns {Promise<Object>} A promise that resolves to an object containing the user's roles,
  *                            categorized by their scope (e.g., "SMP" for user roles and "ORG" for org roles).
  */
-export async function scopedRoleServiceController(userID: string): Promise<{ SMP: Role[], ORG: Role[] }> {
-  const userRoles = await getUserRolesFromUsspService(userID);
+export async function scopedRoleServiceController(userID: number): Promise<{ SMP: Role[], ORG: Role[] }> {
   const orgRoles = await getOrgRolesFromOrgService(userID);
+  console.log(`scopedRoleServiceController orgRoles: ${JSON.stringify(orgRoles, null, 2)}`);
+  const userRoles = await getUserRolesFromUsspService(userID);
 
   const roles: { SMP: Role[], ORG: Role[] } = {
     SMP: [],
@@ -186,17 +171,26 @@ export async function scopedRoleServiceController(userID: string): Promise<{ SMP
  * @param {string} userID - The ID of the user whose roles are to be fetched.
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of user roles.
  */
-const getUserRolesFromUsspService = async (userID: string): Promise<Role[]> => {
+const getUserRolesFromUsspService = async (userID: number): Promise<Role[]> => {
+  if (!userID) {
+    return [];
+  }
   const query = gql`
-    query GetUserRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
-      userRoles(pagination: $pagination, sort: $sort, filter: $filter) {
-        roleID
-        userRoleID
-        legend
-        state
-        userID
-      }
-    }
+query GetUserRoles($filter: [FilterInput!], $sort: SortInput, $pagination: PaginationInput) {
+  userRoles(filter: $filter, sort: $sort, pagination: $pagination) {
+    userRoleID
+    uniqRef
+    slug
+    legend
+    authorID
+    userID
+    roleID
+    state
+    createdAt
+    updatedAt
+    deletedAt
+  }
+}
   `;
 
   const variables = {
@@ -221,7 +215,10 @@ const getUserRolesFromUsspService = async (userID: string): Promise<Role[]> => {
  *   - {string} userID - The ID of the user.
  *   - {string} state - The state of the user organization.
  */
-export const getOrgRolesFromOrgService = async (userID: string): Promise<Role[]> => {
+export const getOrgRolesFromOrgService = async (userID: number): Promise<Role[]> => {
+  if (!userID) {
+    return [];
+  } 
   const query = gql`
     query GetOrgRoles($pagination: PaginationInput, $sort: SortInput, $filter: [FilterInput!]) {
       userOrganizations(pagination: $pagination, sort: $sort, filter: $filter) {
@@ -240,9 +237,10 @@ export const getOrgRolesFromOrgService = async (userID: string): Promise<Role[]>
     sort: { field: "userOrganizationID", order: "ASC" },
     filter: [{ field: "userID", value: `${userID}`, operator: "=" }]
   };
+  
   console.log(`getOrgRolesFromOrgService ORG_SERVICE_URL: ${ORG_SERVICE_URL}`);
   const response = await request(ORG_SERVICE_URL, query, variables);
   return (response as any).userOrganizations;
 };
 
-export const authenticationMiddleware = authenticationMiddlewareBuilder(undefined, getOrgRolesFromOrgService);
+export const authenticationMiddleware = authenticationMiddlewareBuilder(undefined, scopedRoleServiceController);
