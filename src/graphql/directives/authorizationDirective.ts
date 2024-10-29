@@ -20,19 +20,26 @@ class SMPError extends Error {
   }
 }
 
+export function userFromContext(context: any) {
+  return context.me;
+}
+
 function checkRolesForScopes(requiredRoles:string[][], requiredScopes: string[][], context: any) {
-  const userRoles: Record<string, any[]> = context.user.roles || []; 
-  if(userRoles && requiredRoles.length > 0 && requiredScopes.length > 0) return false;
-  const isAuthorized = requiredRoles.some((roleArray: string[], index: number) => {
-    const scopeArray: string[] = requiredScopes[index];
-    if (!scopeArray) return false;
-    console.log("scopeArray", scopeArray);
-    console.log("roleArray", roleArray);
-    console.log("userRoles", userRoles);
-    
-    //TODO: Next release should check the role title/name and not the legend associated to the role
-    const hasScopesAndRoles = scopeArray.every((scope) => userRoles[scope].every((role) => roleArray.includes(role.legend)));
-    return hasScopesAndRoles ;
+  const userRoles: Record<string, any[]>  = userFromContext(context).roles || {};
+  const isIterable = Object.keys(userRoles).length !== 0 && requiredRoles.length > 0 && requiredRoles.length == requiredScopes.length;
+  const isAuthorized = isIterable && requiredRoles.some((roleArray, index) => {
+      const scopeArray = requiredScopes[index];
+      if (!scopeArray)
+          return false;
+      // console.log("Require scopeArray", scopeArray);
+      // console.log("Require roleArray", roleArray);
+      // console.log("userRoles", userRoles);
+
+      //TODO: Next release should check the role title/name and not the legend associated to the role
+      const hasScopesAndRoles = scopeArray.every((scope) => { 
+          // console.log("userRoles for Scope", userRoles[scope]); 
+          return roleArray.every((role) => userRoles[scope].includes(role))});
+      return hasScopesAndRoles;
   });
   return isAuthorized;
 }
