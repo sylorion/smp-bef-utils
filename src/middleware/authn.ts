@@ -24,7 +24,7 @@ export function authenticationMiddlewareBuilder(
     const userToken = req.headers['authorization'] || req.headers['Authorization'];
     if (!userToken || !userToken.startsWith('Bearer ')) {
       if (process.env.ENV_NODE != "prod") {
-        console.error("======== NO BEARER FOR USER ========="); 
+        console.warn("======== NO BEARER FOR USER ========="); 
       }
     } else {
       const token = userToken.split(' ')[1];
@@ -33,27 +33,26 @@ export function authenticationMiddlewareBuilder(
         let decodedToken;
         try {
             decodedToken = jwt.verify(token, JWT_SECRET);
-        }
-        catch (error) {
+        } catch (error) {
             console.error("JWT verification failed:", JSON.stringify(error, null, 2));
         }
-
         try { 
           const { id } = (decodedToken as any);
-          // console.log(`authenticationMiddlewareBuilder Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
-
-          let userDetails = undefined;
-          if (userDetailService) userDetails = await userDetailService(Number(id));
-          let scopedRoles = undefined;
-          if (scopedRoleService) scopedRoles = await scopedRoleService(Number(id));
-          
-          const user = {
-            id: id,
-            user: userDetails,
-            roles: scopedRoles,
+          if(id) {
+            // console.log(`authenticationMiddlewareBuilder Decoded token: ${JSON.stringify(decodedToken, null, 2)}`);
+            let userDetails = undefined;
+            if (userDetailService) userDetails = await userDetailService(Number(id));
+            let scopedRoles = undefined;
+            if (scopedRoleService) scopedRoles = await scopedRoleService(Number(id));
+            
+            const user = {
+              id: id,
+              user: userDetails,
+              roles: scopedRoles,
+            }
+            set(req, 'auth', user);
+            // console.log(`authenticationMiddlewareBuilder Me: ${JSON.stringify(req.auth, null, 2)}`);
           }
-          set(req, 'auth', user);
-          // console.log(`authenticationMiddlewareBuilder Me: ${JSON.stringify(req.auth, null, 2)}`);
         } catch (error) {
           if (process.env.ENV_NODE != "prod") {
             console.error("Retrieval failed:", error);

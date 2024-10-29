@@ -31,6 +31,9 @@ export async function rolesLoaderFor(userID: number, context: object | null): Pr
  *                            categorized by their scope (e.g., "SMP" for user roles and "ORG" for org roles).
  */
 export async function scopedRoleServiceController(userID: number): Promise<ScopedRole> {
+  if (!userID) {
+    throw new Error("User ID is required to fetch user roles.");
+  }
   const orgRoles = await getOrgRolesFromOrgService(userID);
   // console.log(`scopedRoleServiceController ${userID} => orgRoles: ${JSON.stringify(orgRoles, null, 2)}`);
   const userRoles = await getUserRolesFromUsspService(userID);
