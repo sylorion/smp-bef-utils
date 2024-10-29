@@ -69,10 +69,10 @@ function handleAuthFailure(context: any, action: string, error: Error) {
   context.errors.push(error);
   switch (action) {
     case 'INFO':
-      context.logger(action.toLowerCase(), error.message);
+      context.logger.info(`[${action.toLowerCase()}] ${error.message}`);
       break;
     case 'WARN':
-      context.logger(action.toLowerCase(), error.message);
+      context.logger.warn(`[${action.toLowerCase()}] ${error.message}`);
       break;
     case 'THROW':
     default:
