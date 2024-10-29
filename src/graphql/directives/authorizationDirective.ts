@@ -51,7 +51,8 @@ function createAuthResolver(
   requiredAction: string
 ): GraphQLFieldResolver<any, any> {
   return async function (source, args, context, info) {
-    if (!context.user) {
+    const user = userFromContext(context);
+    if (!user) {
       const error = new SMPError('Not authenticated', "AUTH_USER_UNDEFINED", { path: info.path });
       return handleAuthFailure(context, requiredAction, error);
     }
