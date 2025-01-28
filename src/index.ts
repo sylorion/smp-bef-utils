@@ -8,7 +8,7 @@ export { getUserRolesFromUsspService, getOrgRolesFromOrgService} from './loaders
 export { authenticationMiddleware, } from './middleware/authn.js'
 export { rolesLoaderFor, userLoaders, authenticatedDirective, authorizationDirective } ;
 
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from '@apollo/server';
 import { makeExecutableSchema } from 'graphql-tools';  
 import * as fs from 'fs';
 
@@ -125,14 +125,14 @@ const getUserFromToken = (token: string): User | null => {
   }
 };
 
-const server = new ApolloServer({
-  schema: schemaWithDirectives,
-  context: ({ req }): GraphQLContext => {
-    const token = req.headers.authorization || '';
-    const user = getUserFromToken(token.replace('Bearer ', '')) ?? undefined;
-    return { user  };
-  },
-});
+// const server = new ApolloServer({
+//   schema: schemaWithDirectives,
+//   context: ({ req:any }): GraphQLContext => {
+//     const token = req.headers.authorization || '';
+//     const user = getUserFromToken(token.replace('Bearer ', '')) ?? undefined;
+//     return { user  };
+//   },
+// });
 
 // server.listen().then(({ url }) => {
 //   console.log(`🚀 Server ready at ${url}`);

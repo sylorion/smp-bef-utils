@@ -9,29 +9,30 @@
     "/build"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "test": "jest",
     "start": "npm run build ; node --trace-deprecation build/index.js",
     "lint": "eslint 'src/**/*.{ts,js}' --fix",
-    "prepare": "tsc --outDir ./build"
+    "prepare": "npx tsc --outDir ./build"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.2",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^16.11.7",
-    "eslint": "^7.32.0",
-    "jest": "^27.5.1",
-    "ts-jest": "^27.1.5",
-    "typescript": "^4.4.4"
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^22.12.0",
+    "eslint": "latest",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "latest"
   },
   "dependencies": {
-    "@graphql-tools/utils": "^10.5.4",
-    "apollo-server": "^3.13.0",
-    "dataloader": "^2.2.2",
-    "graphql": "^16.9.0",
-    "graphql-request": "^7.1.0",
-    "graphql-tools": "^9.0.1",
+    "@apollo/server": "^4.11.3",
+    "@graphql-tools/utils": "^10.7.2",
+    "dataloader": "^2.2.3",
+    "graphql": "^16.10.0",
+    "graphql-request": "^7.1.2",
+    "graphql-tools": "latest",
     "jsonwebtoken": "^9.0.2",
+    "lru-cache": "^11.0.2",
     "node-cache": "^5.1.2"
   },
   "repository": {
@@ -40,7 +41,6 @@
   },
   "keywords": [
     "Generator",
-    "Protobuf",
     "GraphQL",
     "TypeScript",
     "Automation",
