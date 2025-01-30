@@ -2,7 +2,7 @@
 import pkgjwt from 'jsonwebtoken';  
 import { ScopedRole } from '../loaders/fetchers/roleFetcher.js';
 import { scopedRoleServiceController } from '../loaders/roleLoader.js';    
-import { set } from './set.js';
+import { set } from '../utils/set.js';
 const jwt = pkgjwt; 
 const JWT_SECRET = process.env.SMP_USER_JWT_ACCESS_SECRET || 'f52001a8f0d6aa43ef65af68f8e9c81fac1a518666a7d8aec94a075ca11bee122dc87244ccfd9ec7187f1f51c066ee4a683bdcf6b0a5d1b5ec683c2b140d742a';
 

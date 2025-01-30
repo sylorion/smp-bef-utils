@@ -6,6 +6,7 @@ import {
   GraphQLFieldResolver
 } from 'graphql'; 
 import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils';
+import { userFromContext } from '../../utils/context.js';
 
 // Création d'une classe de base pour les exceptions personnalisées
 class SMPError extends Error {
