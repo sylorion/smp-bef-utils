@@ -1,4 +1,4 @@
-// src/middleware/set.ts
+// src/utils/set.ts
 export function set<T extends Record<string, any>>(obj: T, path: string | string[], value: unknown): T {
   if (typeof obj !== 'object' || obj === null) {
     return obj;

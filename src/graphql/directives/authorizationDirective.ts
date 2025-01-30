@@ -20,10 +20,6 @@ class SMPError extends Error {
   }
 }
 
-export function userFromContext(context: any) {
-  return context.me;
-}
-
 function checkRolesForScopes(requiredRoles:string[][], requiredScopes: string[][], context: any) {
   const userRoles: Record<string, any[]>  = userFromContext(context).roles || {};
   const isIterable = Object.keys(userRoles).length !== 0 && requiredRoles.length > 0 && requiredRoles.length == requiredScopes.length;

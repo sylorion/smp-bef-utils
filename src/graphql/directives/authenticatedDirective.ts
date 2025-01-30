@@ -5,6 +5,7 @@ import {
   GraphQLObjectType,
 } from 'graphql'; 
 import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils';
+import { userFromContext } from '../../utils/context.js';
 
 export function authenticatedDirective(directiveName: string) {
   return {
@@ -20,7 +21,8 @@ export function authenticatedDirective(directiveName: string) {
                 const field = fields[fieldName];
                 const { resolve = defaultFieldResolver } = field;
                 field.resolve = async function (source, args, context, info) {
-                  if (!context.user) {
+                  const user = userFromContext(context);
+                  if (!user) {
                     throw new Error('Not authenticated');
                   }
                   return resolve(source, args, context, info);
