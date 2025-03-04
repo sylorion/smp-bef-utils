@@ -1,5 +1,5 @@
 // src/utils/OpenSearchManager.ts
-import { Client, ClientOptions, ApiResponse, RequestParams } from '@opensearch-project/opensearch';
+import { Client, ClientOptions, ApiResponse } from '@opensearch-project/opensearch';
 
 /**
  * Describes the configuration needed to connect to an OpenSearch cluster.
@@ -237,34 +237,4 @@ export class OpenSearchManager {
     }
   }
 
-  /**
-   * Performs a reindex operation from a source index to a destination index.
-   * @param sourceIndex      - The source index.
-   * @param destinationIndex - The destination index.
-   * @param query            - Optional DSL query to filter documents during reindex.
-   */
-  public async reindex(
-    sourceIndex: string,
-    destinationIndex: string,
-    query?: Record<string, any>
-  ): Promise<void> {
-    try {
-      const body: RequestParams.Reindex['body'] = {
-        source: { index: sourceIndex },
-        dest: { index: destinationIndex },
-      };
-      if (query) {
-        body.source.query = query;
-      }
-
-      const response = await this.client.reindex({ body, refresh: true, wait_for_completion: true });
-      console.log(
-        `Successfully reindexed from '${sourceIndex}' to '${destinationIndex}'.`,
-        response.body
-      );
-    } catch (error) {
-      console.error(`Error reindexing from '${sourceIndex}' to '${destinationIndex}':`, error);
-      throw error;
-    }
-  }
 }
