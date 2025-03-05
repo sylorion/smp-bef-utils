@@ -48,3 +48,5 @@ export function authenticatedDirective(directiveName: string) {
       }),
   };
 }
+
+export const { authenticatedDirectiveTypeDefs, authenticatedDirectiveTransformer } = authenticatedDirective('authenticated');

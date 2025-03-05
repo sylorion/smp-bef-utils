@@ -118,3 +118,5 @@ function handleAuthFailure(context: any, action: string, error: Error) {
       }),
   };
 }
+
+export const { authorizationDirectiveTypeDefs, authorizationDirectiveTransformer } = authorizationDirective('authorization'); 
