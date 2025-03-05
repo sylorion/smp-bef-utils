@@ -30,6 +30,6 @@ const { authorizationDirectiveTypeDefs, authorizationDirectiveTransformer } = au
 const { authenticatedDirectiveTypeDefs, authenticatedDirectiveTransformer } = authenticatedDirective('authenticated');
 
 export { authorizationDirectiveTypeDefs, authenticatedDirectiveTypeDefs, authorizationDirectiveTransformer, authenticatedDirectiveTransformer };
-export { FilterInput } from './utils/listing-filter.js';
-export { PaginationInput } from './utils/listing-pagination.js';
-export { SortInput } from './utils/listing-sort.js';
+export { FilterInput, buildWhereClause } from './utils/listing-filter.js';
+export { PaginationInput, buildPagination } from './utils/listing-pagination.js';
+export { SortInput, buildSort } from './utils/listing-sort.js';
